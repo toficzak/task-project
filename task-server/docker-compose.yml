@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: ${MONGO_CONTAINER_NAME}
+    command: mongod --port ${MONGO_PORT}
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js  # Mount initialization script
+    env_file:
+      - .env
+
+
+  task-server:
+    build: .
+    container_name: task-server
+    ports:
+      - "${APP_PORT}:8080"
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
+
+volumes:
+  mongodb_data:
+    driver: local
